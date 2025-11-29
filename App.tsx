@@ -52,7 +52,15 @@ export default function App() {
     if (sectionId) {
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        // Offset for sticky headers if necessary
+        const headerOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth"
+        });
       }
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,7 +110,8 @@ export default function App() {
       />
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto w-full md:ml-64">
+      {/* Removed w-full to prevent horizontal overflow with ml-64. Added min-w-0 for grid containment. */}
+      <main className="flex-1 p-4 md:p-8 md:ml-64 min-w-0">
         
         <StudentHeader 
           student={currentStudent} 
@@ -110,12 +119,10 @@ export default function App() {
           onUpdateLevel={(newLevel) => updateStudentData(currentStudent.id, { level: newLevel })}
         />
 
-        {/* TOP ROW: OBJECTIVES, NOTES AND CALENDAR */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start mb-6">
+        {/* ROW 1: OBJECTIVES AND NOTES (Split 50/50 on large screens) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           
-          {/* LEFT COLUMN: OBJECTIVES & NOTES */}
-          <div className="md:col-span-7 space-y-6">
-            
+          <div id="objectives-section">
             <ChecklistSection 
               title="Objetivos del Curso"
               items={currentStudent.objectives}
@@ -129,28 +136,30 @@ export default function App() {
               }}
               onUpdate={(newItems) => updateStudentData(currentStudent.id, { objectives: newItems })}
             />
+          </div>
 
+          <div id="notes-section">
             <ChecklistSection 
-              title="Observaciones / Ideas / Necesidades"
+              title="Observaciones / Ideas"
               items={currentStudent.notes}
               role={state.currentUserRole!}
               canEdit={true} 
               onUpdate={(newItems) => updateStudentData(currentStudent.id, { notes: newItems })}
             />
           </div>
-
-          {/* RIGHT COLUMN: CALENDAR ONLY */}
-          <div className="md:col-span-5 h-full">
-            <CalendarSection 
-              calendarUrl={currentStudent.calendarUrl}
-              role={state.currentUserRole}
-              onUpdateUrl={(url) => updateStudentData(currentStudent.id, { calendarUrl: url })}
-            />
-          </div>
         </div>
 
-        {/* FULL WIDTH ROW: RESOURCES */}
-        <div id="resources-section">
+        {/* ROW 2: CALENDAR (Full Width Container, component limits its own width) */}
+        <div id="calendar-section" className="mb-8 w-full">
+          <CalendarSection 
+            calendarUrl={currentStudent.calendarUrl}
+            role={state.currentUserRole}
+            onUpdateUrl={(url) => updateStudentData(currentStudent.id, { calendarUrl: url })}
+          />
+        </div>
+
+        {/* ROW 3: RESOURCES (Full Width) */}
+        <div id="resources-section" className="w-full">
           <ResourcesSection 
             resources={currentStudent.resources}
             role={state.currentUserRole!}

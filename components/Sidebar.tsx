@@ -7,7 +7,10 @@ import {
   X, 
   MessageCircle, 
   Mail, 
-  LogOut 
+  LogOut,
+  Target,
+  Lightbulb,
+  Calendar
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -70,12 +73,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         <NavItem 
           icon={<User size={20} />} 
           label="Perfil" 
           onClick={() => onNavigate()} 
-          active 
+        />
+        <NavItem 
+          icon={<Target size={20} />} 
+          label="Objetivos" 
+          onClick={() => onNavigate('objectives-section')}
+        />
+        <NavItem 
+          icon={<Lightbulb size={20} />} 
+          label="Observaciones" 
+          onClick={() => onNavigate('notes-section')}
+        />
+        <NavItem 
+          icon={<Calendar size={20} />} 
+          label="Calendario" 
+          onClick={() => onNavigate('calendar-section')}
         />
         <NavItem 
           icon={<BookOpen size={20} />} 
@@ -128,4 +145,4 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
     </aside>
   );
-};
+}

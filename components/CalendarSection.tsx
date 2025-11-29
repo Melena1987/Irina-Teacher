@@ -9,8 +9,27 @@ interface CalendarSectionProps {
 }
 
 export const CalendarSection: React.FC<CalendarSectionProps> = ({ calendarUrl, role, onUpdateUrl }) => {
+  
+  // Helper to ensure weekly view
+  const getWeeklyUrl = (url: string) => {
+    try {
+      if (!url) return '';
+      // If it's already an embed URL, append mode=WEEK if not present
+      if (url.includes('calendar.google.com/calendar/embed')) {
+        if (!url.includes('mode=')) {
+          return `${url}&mode=WEEK`;
+        }
+      }
+      return url;
+    } catch (e) {
+      return url;
+    }
+  };
+
+  const finalUrl = getWeeklyUrl(calendarUrl || '');
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 h-full flex flex-col">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <CalendarIcon className="text-blue-500" /> Calendario
@@ -28,24 +47,30 @@ export const CalendarSection: React.FC<CalendarSectionProps> = ({ calendarUrl, r
         )}
       </div>
       
-      <div className="aspect-[4/3] bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative flex-1">
-        {calendarUrl ? (
-          <iframe 
-            src={calendarUrl} 
-            style={{border: 0}} 
-            width="100%" 
-            height="100%" 
-            frameBorder="0" 
-            scrolling="no"
-            title="Calendario de Clases"
-            className="absolute inset-0 w-full h-full"
-          ></iframe>
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-6 text-center">
-            <CalendarIcon className="w-12 h-12 mb-2 opacity-50" />
-            <p className="text-sm">El profesor aún no ha vinculado el calendario.</p>
-          </div>
-        )}
+      {/* 
+        Restricted width to make it "small" (max-w-3xl) while the container is full width.
+        Added a min-height for usability.
+      */}
+      <div className="w-full max-w-3xl">
+        <div className="aspect-[4/3] md:aspect-[16/9] bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative">
+          {finalUrl ? (
+            <iframe 
+              src={finalUrl} 
+              style={{border: 0}} 
+              width="100%" 
+              height="100%" 
+              frameBorder="0" 
+              scrolling="no"
+              title="Calendario de Clases"
+              className="absolute inset-0 w-full h-full"
+            ></iframe>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-6 text-center">
+              <CalendarIcon className="w-12 h-12 mb-2 opacity-50" />
+              <p className="text-sm">El profesor aún no ha vinculado el calendario.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
