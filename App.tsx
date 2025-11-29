@@ -103,8 +103,12 @@ export default function App() {
     );
   }
 
-  // Calculate uncompleted notes for the notification badge
-  const pendingNotesCount = currentStudent.notes.filter(n => !n.completed).length;
+  // Calculate notifications logic:
+  // For Students: Count items they haven't "seen" yet. (!seen covers false or undefined)
+  // For Teachers: Keep counting "uncompleted" items to track student progress.
+  const notificationCount = state.currentUserRole === Role.STUDENT
+    ? (currentStudent.notes.filter(n => !n.seen).length + currentStudent.objectives.filter(o => !o.seen).length)
+    : (currentStudent.notes.filter(n => !n.completed).length);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
@@ -130,7 +134,7 @@ export default function App() {
         onAddStudent={handleAddStudent}
         onLogout={handleLogout}
         onNavigate={handleNavigate}
-        notificationCount={pendingNotesCount}
+        notificationCount={notificationCount}
       />
 
       {/* MAIN CONTENT AREA */}

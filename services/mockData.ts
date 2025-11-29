@@ -9,11 +9,11 @@ export const INITIAL_STUDENTS: StudentProfile[] = [
     language: 'Inglés',
     calendarUrl: 'https://calendar.google.com/calendar/embed?src=en.spanish%23holiday%40group.v.calendar.google.com&ctz=Europe%2FMadrid', // Generic holiday calendar as example
     objectives: [
-      { id: 'o1', text: 'Mejorar pronunciación de los tiempos pasados', completed: false },
-      { id: 'o2', text: 'Escribir 3 ensayos formales', completed: true },
+      { id: 'o1', text: 'Mejorar pronunciación de los tiempos pasados', completed: false, seen: true },
+      { id: 'o2', text: 'Escribir 3 ensayos formales', completed: true, seen: true },
     ],
     notes: [
-      { id: 'n1', text: 'Me gustaría repasar phrasal verbs la próxima clase', completed: false },
+      { id: 'n1', text: 'Me gustaría repasar phrasal verbs la próxima clase', completed: false, seen: true },
     ],
     resources: [
       { id: 'r1', title: 'BBC Learning English', url: 'https://www.bbc.co.uk/learningenglish/', category: 'website', description: 'Noticias y gramática' },
@@ -27,7 +27,7 @@ export const INITIAL_STUDENTS: StudentProfile[] = [
     level: 'A2',
     language: 'Alemán',
     objectives: [
-      { id: 'o1', text: 'Aprender vocabulario de la casa', completed: false },
+      { id: 'o1', text: 'Aprender vocabulario de la casa', completed: false, seen: true },
     ],
     notes: [],
     resources: []

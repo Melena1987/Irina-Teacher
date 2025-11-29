@@ -7,6 +7,7 @@ export interface ChecklistItem {
   id: string;
   text: string;
   completed: boolean;
+  seen?: boolean;
 }
 
 export interface Resource {

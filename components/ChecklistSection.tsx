@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChecklistItem, Role } from '../types';
 import { Plus, Trash2, CheckCircle2, Circle, Wand2, Loader2 } from 'lucide-react';
 import { generateSuggestedObjectives } from '../services/geminiService';
@@ -29,6 +29,33 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
 }) => {
   const [newItemText, setNewItemText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Automatically mark items as seen when they come into view for the student
+  useEffect(() => {
+    if (role !== Role.STUDENT) return;
+
+    // Check if there are any unseen items before setting up observer
+    const hasUnseen = items.some(item => !item.seen);
+    if (!hasUnseen) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          // Mark all as seen
+          const updated = items.map(item => ({ ...item, seen: true }));
+          onUpdate(updated);
+        }
+      },
+      { threshold: 0.1 } // Trigger when 10% of the component is visible
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [items, role, onUpdate]);
 
   const toggleComplete = (id: string) => {
     const updated = items.map(item =>
@@ -42,7 +69,9 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
     const newItem: ChecklistItem = {
       id: Date.now().toString(),
       text: newItemText,
-      completed: false
+      completed: false,
+      // If student creates it, they've seen it. If teacher creates it, student hasn't seen it.
+      seen: role === Role.STUDENT 
     };
     onUpdate([...items, newItem]);
     setNewItemText('');
@@ -64,7 +93,8 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
     const newItems: ChecklistItem[] = suggestions.map((text, idx) => ({
       id: `ai-${Date.now()}-${idx}`,
       text,
-      completed: false
+      completed: false,
+      seen: false // Generated items are new/unseen for the student
     }));
 
     onUpdate([...items, ...newItems]);
@@ -72,7 +102,7 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full">
+    <div ref={containerRef} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-slate-800">{title}</h3>
         
@@ -103,8 +133,11 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
             >
               {item.completed ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
             </button>
-            <span className={`flex-1 text-sm ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+            <span className={`flex-1 text-sm ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'} ${!item.seen && role === Role.STUDENT ? 'font-semibold' : ''}`}>
               {item.text}
+              {!item.seen && role === Role.STUDENT && (
+                <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full align-middle" title="Nuevo"></span>
+              )}
             </span>
             {canEdit && (
               <button
