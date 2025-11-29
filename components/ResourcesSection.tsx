@@ -113,12 +113,12 @@ export const ResourcesSection: React.FC<ResourcesSectionProps> = ({
             rel="noopener noreferrer" 
             className="group relative flex items-center justify-center aspect-square bg-white border border-slate-200 rounded-2xl hover:border-emerald-400 hover:shadow-md transition-all overflow-hidden"
           >
-            {/* Full Size Icon */}
-            <div className="w-full h-full p-4 flex items-center justify-center">
+            {/* Full Size Icon - No padding so it fills the button */}
+            <div className="w-full h-full flex items-center justify-center bg-white">
               <img 
                 src={getFaviconUrl(res.url)} 
                 alt={res.title}
-                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-sm" 
+                className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110 p-1" 
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://www.google.com/s2/favicons?domain=google.com';
                 }}
@@ -126,8 +126,8 @@ export const ResourcesSection: React.FC<ResourcesSectionProps> = ({
             </div>
             
             {/* Overlay Title on Hover */}
-            <div className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center p-2 text-center backdrop-blur-sm">
-              <span className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-1">
+            <div className="absolute inset-0 bg-slate-900/90 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col items-center justify-center p-3 text-center backdrop-blur-sm">
+              <span className="text-emerald-400 text-[10px] font-bold uppercase tracking-wider mb-2">
                 {getPlatformName(res.url)}
               </span>
               <span className="text-white text-xs font-medium line-clamp-3 leading-tight">

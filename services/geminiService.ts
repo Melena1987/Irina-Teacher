@@ -15,7 +15,7 @@ const getApiKey = () => {
       return import.meta.env.VITE_API_KEY;
     }
   } catch (e) {
-    console.warn("Could not read API Key from environment");
+    console.warn("Could not read API Key from environment:", e);
   }
   return '';
 };
