@@ -1,0 +1,5 @@
+{
+  "name": "IrinaTeacher - Área del Alumno",
+  "description": "Plataforma de gestión académica para irinateacher.com. Permite a profesores y alumnos gestionar objetivos, recursos y calendarios de clases de idiomas.",
+  "requestFramePermissions": []
+}
