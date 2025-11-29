@@ -110,12 +110,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <aside 
       className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-100 flex flex-col shadow-xl flex-shrink-0
+        fixed top-0 left-0 bottom-0 z-50 w-64 bg-slate-900 text-slate-100 flex flex-col shadow-xl flex-shrink-0
         transform transition-transform duration-300 ease-in-out md:translate-x-0
+        h-[100dvh] overflow-y-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
     >
-      <div className="p-6 border-b border-slate-800 flex justify-between items-start">
+      <div className="p-6 border-b border-slate-800 flex justify-between items-start flex-shrink-0">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent">
@@ -144,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {currentUserRole === Role.TEACHER && (
-        <div className="p-4 border-b border-slate-800">
+        <div className="p-4 border-b border-slate-800 flex-shrink-0">
           <div className="flex justify-between items-center mb-2">
             <label className="text-xs font-semibold text-slate-500 block uppercase">Seleccionar Alumno</label>
             <button 
@@ -168,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* COMPACT NAV GRID */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 flex-shrink-0">
         <div className="grid grid-cols-3 gap-3">
           {navItems.map((item, index) => (
             <button
@@ -187,10 +188,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </nav>
 
       {/* MINI CALENDAR WIDGET */}
-      <MiniCalendar />
+      <div className="flex-shrink-0">
+        <MiniCalendar />
+      </div>
 
       {/* CONTACT SECTION */}
-      <div className="p-4 border-t border-slate-800 space-y-1">
+      <div className="p-4 border-t border-slate-800 space-y-1 flex-shrink-0">
         <p className="px-2 text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Contacto</p>
         <a 
           href="https://wa.me/34672290571" 
@@ -210,7 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </a>
       </div>
 
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-4 border-t border-slate-800 flex-shrink-0">
         <div className="flex items-center gap-3 mb-4 px-2">
           <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold">
             {currentUserRole === Role.TEACHER ? 'IT' : currentStudentName.substring(0,2).toUpperCase()}
