@@ -72,9 +72,10 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-slate-800">{title}</h3>
+        
         {isAIEnabled && canEdit && (
           <button
             onClick={handleGenerateAI}
@@ -88,7 +89,7 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-3 flex-1">
         {items.length === 0 && (
           <p className="text-slate-400 italic text-sm text-center py-4">No hay elementos todavía.</p>
         )}

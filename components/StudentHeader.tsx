@@ -14,7 +14,7 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({ student, role, onU
   const langInfo = getLanguageInfo(student.language);
 
   return (
-    <header className="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <header className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
         <h2 className="text-3xl font-bold text-slate-800">{student.name}</h2>
         <div className="flex flex-wrap gap-3 mt-2">

@@ -29,8 +29,8 @@ export const CalendarSection: React.FC<CalendarSectionProps> = ({ calendarUrl, r
   const finalUrl = getWeeklyUrl(calendarUrl || '');
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col">
-      <div className="flex justify-between items-center mb-4">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full">
+      <div className="flex justify-between items-center mb-4 flex-shrink-0">
         <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <CalendarIcon className="text-blue-500" /> Calendario
         </h3>
@@ -48,11 +48,12 @@ export const CalendarSection: React.FC<CalendarSectionProps> = ({ calendarUrl, r
       </div>
       
       {/* 
-        Restricted width to make it "small" (max-w-3xl) while the container is full width.
-        Added a min-height for usability.
+        Updated Container for Layout:
+        - Height is calculated to fit viewport minus header/margins approximately (calc(100vh - 80px)).
+        - This fits well because the calendar now starts at the top of the main content area.
       */}
-      <div className="w-full max-w-3xl">
-        <div className="aspect-[4/3] md:aspect-[16/9] bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative">
+      <div className="w-full flex-1">
+        <div className="h-[calc(100vh-80px)] min-h-[500px] w-full bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative">
           {finalUrl ? (
             <iframe 
               src={finalUrl} 

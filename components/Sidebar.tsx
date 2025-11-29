@@ -1,6 +1,5 @@
 import React from 'react';
 import { Role, StudentProfile } from '../types';
-import { NavItem } from './NavItem';
 import { 
   User, 
   BookOpen, 
@@ -10,7 +9,9 @@ import {
   LogOut,
   Target,
   Lightbulb,
-  Calendar
+  Calendar,
+  UserPlus,
+  Bell
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -21,9 +22,60 @@ interface SidebarProps {
   currentStudentId: string | null;
   currentStudentName: string;
   onStudentChange: (id: string) => void;
+  onAddStudent?: (name: string) => void;
   onLogout: () => void;
   onNavigate: (sectionId?: string) => void;
+  notificationCount?: number;
 }
+
+const MiniCalendar = () => {
+  const date = new Date();
+  const monthName = date.toLocaleString('es-ES', { month: 'long' });
+  const year = date.getFullYear();
+  const daysInMonth = new Date(year, date.getMonth() + 1, 0).getDate();
+  const firstDay = new Date(year, date.getMonth(), 1).getDay();
+  // Adjust for Monday start (0=Sunday in JS, but we want 0=Monday for UI usually in ES)
+  // JS: Sun=0, Mon=1... Sat=6. 
+  // Target: Mon=0, Tue=1... Sun=6.
+  const offset = firstDay === 0 ? 6 : firstDay - 1;
+
+  return (
+    <div className="px-6 py-4">
+      <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+        <div className="text-center text-xs font-semibold text-slate-400 mb-3 capitalize tracking-wide">
+          {monthName} {year}
+        </div>
+        <div className="grid grid-cols-7 gap-1 text-[10px] text-slate-500 mb-1">
+          {['L','M','X','J','V','S','D'].map(d => (
+            <div key={d} className="text-center font-medium">{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {Array.from({ length: offset }).map((_, i) => (
+            <div key={`empty-${i}`} />
+          ))}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const isToday = day === date.getDate();
+            return (
+              <div 
+                key={day} 
+                className={`
+                  aspect-square flex items-center justify-center rounded-full text-[10px] font-medium transition-all
+                  ${isToday 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50 scale-110' 
+                    : 'text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 cursor-default'}
+                `}
+              >
+                {day}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
@@ -33,9 +85,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentStudentId,
   currentStudentName,
   onStudentChange,
+  onAddStudent,
   onLogout,
-  onNavigate
+  onNavigate,
+  notificationCount
 }) => {
+  const navItems = [
+    { icon: <User size={20} />, label: 'Perfil', id: undefined },
+    { icon: <Target size={20} />, label: 'Objetivos', id: 'objectives-section' },
+    { icon: <Lightbulb size={20} />, label: 'Observaciones', id: 'notes-section' },
+    { icon: <Calendar size={20} />, label: 'Calendario', id: 'calendar-section' },
+    { icon: <BookOpen size={20} />, label: 'Recursos', id: 'resources-section' },
+  ];
+
+  const handleAddClick = () => {
+    if (onAddStudent) {
+      const name = prompt("Nombre del nuevo estudiante:");
+      if (name && name.trim()) {
+        onAddStudent(name.trim());
+      }
+    }
+  };
+
   return (
     <aside 
       className={`
@@ -46,9 +117,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       <div className="p-6 border-b border-slate-800 flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent">
-            IrinaTeacher
-          </h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent">
+              IrinaTeacher
+            </h1>
+            {notificationCount !== undefined && notificationCount > 0 && (
+              <button
+                onClick={() => onNavigate('notes-section')}
+                className="relative group animate-pulse hover:animate-none transition-transform hover:scale-110"
+                title={`${notificationCount} nuevas observaciones`}
+              >
+                <Bell className="w-5 h-5 text-amber-500 fill-amber-500/20" />
+                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-slate-900">
+                  {notificationCount}
+                </span>
+              </button>
+            )}
+          </div>
           <p className="text-xs text-slate-400 mt-1 uppercase tracking-wider">
             {currentUserRole === Role.TEACHER ? 'Portal Profesor' : 'Área Alumno'}
           </p>
@@ -60,7 +145,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {currentUserRole === Role.TEACHER && (
         <div className="p-4 border-b border-slate-800">
-          <label className="text-xs font-semibold text-slate-500 mb-2 block uppercase">Seleccionar Alumno</label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-xs font-semibold text-slate-500 block uppercase">Seleccionar Alumno</label>
+            <button 
+              onClick={handleAddClick}
+              className="text-xs flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors"
+              title="Añadir nuevo alumno"
+            >
+              <UserPlus size={14} /> Añadir
+            </button>
+          </div>
           <select 
             value={currentStudentId || ''}
             onChange={(e) => onStudentChange(e.target.value)}
@@ -73,33 +167,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-        <NavItem 
-          icon={<User size={20} />} 
-          label="Perfil" 
-          onClick={() => onNavigate()} 
-        />
-        <NavItem 
-          icon={<Target size={20} />} 
-          label="Objetivos" 
-          onClick={() => onNavigate('objectives-section')}
-        />
-        <NavItem 
-          icon={<Lightbulb size={20} />} 
-          label="Observaciones" 
-          onClick={() => onNavigate('notes-section')}
-        />
-        <NavItem 
-          icon={<Calendar size={20} />} 
-          label="Calendario" 
-          onClick={() => onNavigate('calendar-section')}
-        />
-        <NavItem 
-          icon={<BookOpen size={20} />} 
-          label="Recursos" 
-          onClick={() => onNavigate('resources-section')}
-        />
+      {/* COMPACT NAV GRID */}
+      <nav className="flex-1 p-4">
+        <div className="grid grid-cols-3 gap-3">
+          {navItems.map((item, index) => (
+            <button
+              key={index}
+              onClick={() => onNavigate(item.id)}
+              className="group relative flex items-center justify-center p-3 rounded-xl bg-slate-800/40 text-slate-400 hover:bg-slate-700 hover:text-white transition-all aspect-square border border-slate-800 hover:border-slate-600 shadow-sm"
+              aria-label={item.label}
+            >
+              {item.icon}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs font-medium rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-slate-700 shadow-xl z-50">
+                {item.label}
+              </div>
+            </button>
+          ))}
+        </div>
       </nav>
+
+      {/* MINI CALENDAR WIDGET */}
+      <MiniCalendar />
 
       {/* CONTACT SECTION */}
       <div className="p-4 border-t border-slate-800 space-y-1">

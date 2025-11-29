@@ -1,15 +1,35 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ChecklistItem } from "../types";
 
-const apiKey = process.env.API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+// SAFETY CHECK: Prevent "process is not defined" error in browsers
+const getApiKey = () => {
+  try {
+    // Check if we are in a Node environment or if a bundler injected process.env
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
+    // Setup for Vite (common in modern React apps)
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {
+    console.warn("Could not read API Key from environment");
+  }
+  return '';
+};
+
+const apiKey = getApiKey();
+// Initialize AI only if key exists to prevent immediate crash, handle in function calls
+const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const generateSuggestedObjectives = async (
   language: string,
   level: string,
   classType: string
 ): Promise<string[]> => {
-  if (!apiKey) {
+  if (!ai || !apiKey) {
     console.warn("API Key not found");
     return [
       "No se ha configurado la API Key.",

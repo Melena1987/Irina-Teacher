@@ -48,6 +48,25 @@ export default function App() {
     }));
   };
 
+  const handleAddStudent = (name: string) => {
+    const newStudent: StudentProfile = {
+      id: Date.now().toString(),
+      name: name,
+      classType: 'Individual',
+      level: 'A1',
+      language: 'Inglés',
+      objectives: [],
+      notes: [],
+      resources: []
+    };
+
+    setState(prev => ({
+      ...prev,
+      students: [...prev.students, newStudent],
+      currentStudentId: newStudent.id
+    }));
+  };
+
   const handleNavigate = (sectionId?: string) => {
     if (sectionId) {
       const element = document.getElementById(sectionId);
@@ -84,6 +103,9 @@ export default function App() {
     );
   }
 
+  // Calculate uncompleted notes for the notification badge
+  const pendingNotesCount = currentStudent.notes.filter(n => !n.completed).length;
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
       
@@ -105,23 +127,48 @@ export default function App() {
         currentStudentId={state.currentStudentId}
         currentStudentName={currentStudent.name}
         onStudentChange={(id) => setState(prev => ({ ...prev, currentStudentId: id }))}
+        onAddStudent={handleAddStudent}
         onLogout={handleLogout}
         onNavigate={handleNavigate}
+        notificationCount={pendingNotesCount}
       />
 
       {/* MAIN CONTENT AREA */}
-      {/* Removed w-full to prevent horizontal overflow with ml-64. Added min-w-0 for grid containment. */}
       <main className="flex-1 p-4 md:p-8 md:ml-64 min-w-0">
         
-        <StudentHeader 
-          student={currentStudent} 
-          role={state.currentUserRole}
-          onUpdateLevel={(newLevel) => updateStudentData(currentStudent.id, { level: newLevel })}
-        />
-
-        {/* ROW 1: OBJECTIVES AND NOTES (Split 50/50 on large screens) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* MAIN GRID LAYOUT: Left Column (Profile + Resources) | Right Column (Calendar) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
           
+          {/* LEFT COLUMN: Student Header and Resources */}
+          <div className="space-y-6">
+            <StudentHeader 
+              student={currentStudent} 
+              role={state.currentUserRole}
+              onUpdateLevel={(newLevel) => updateStudentData(currentStudent.id, { level: newLevel })}
+            />
+
+            <div id="resources-section" className="w-full">
+              <ResourcesSection 
+                resources={currentStudent.resources}
+                role={state.currentUserRole!}
+                onUpdate={(newResources) => updateStudentData(currentStudent.id, { resources: newResources })}
+              />
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Calendar (Full Height of the column) */}
+          <div id="calendar-section" className="w-full">
+            <CalendarSection 
+              calendarUrl={currentStudent.calendarUrl}
+              role={state.currentUserRole}
+              onUpdateUrl={(url) => updateStudentData(currentStudent.id, { calendarUrl: url })}
+            />
+          </div>
+
+        </div>
+
+        {/* BOTTOM ROW: OBJECTIVES & NOTES (Side by Side) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div id="objectives-section">
             <ChecklistSection 
               title="Objetivos del Curso"
@@ -147,24 +194,6 @@ export default function App() {
               onUpdate={(newItems) => updateStudentData(currentStudent.id, { notes: newItems })}
             />
           </div>
-        </div>
-
-        {/* ROW 2: CALENDAR (Full Width Container, component limits its own width) */}
-        <div id="calendar-section" className="mb-8 w-full">
-          <CalendarSection 
-            calendarUrl={currentStudent.calendarUrl}
-            role={state.currentUserRole}
-            onUpdateUrl={(url) => updateStudentData(currentStudent.id, { calendarUrl: url })}
-          />
-        </div>
-
-        {/* ROW 3: RESOURCES (Full Width) */}
-        <div id="resources-section" className="w-full">
-          <ResourcesSection 
-            resources={currentStudent.resources}
-            role={state.currentUserRole!}
-            onUpdate={(newResources) => updateStudentData(currentStudent.id, { resources: newResources })}
-          />
         </div>
 
       </main>
