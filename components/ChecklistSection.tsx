@@ -31,10 +31,9 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Automatically mark items as seen when they come into view for the student
+  // Automatically mark items as seen when they come into view
+  // This now applies to BOTH Student and Teacher to clear notifications
   useEffect(() => {
-    if (role !== Role.STUDENT) return;
-
     // Check if there are any unseen items before setting up observer
     const hasUnseen = items.some(item => !item.seen);
     if (!hasUnseen) return;
@@ -55,7 +54,7 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
     }
 
     return () => observer.disconnect();
-  }, [items, role, onUpdate]);
+  }, [items, onUpdate]);
 
   const toggleComplete = (id: string) => {
     const updated = items.map(item =>
@@ -70,8 +69,9 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
       id: Date.now().toString(),
       text: newItemText,
       completed: false,
-      // If student creates it, they've seen it. If teacher creates it, student hasn't seen it.
-      seen: role === Role.STUDENT 
+      // If student creates it, they've seen it. If teacher creates it, they've seen it.
+      // But the other party hasn't.
+      seen: false
     };
     onUpdate([...items, newItem]);
     setNewItemText('');
@@ -133,9 +133,9 @@ export const ChecklistSection: React.FC<ChecklistSectionProps> = ({
             >
               {item.completed ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
             </button>
-            <span className={`flex-1 text-sm ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'} ${!item.seen && role === Role.STUDENT ? 'font-semibold' : ''}`}>
+            <span className={`flex-1 text-sm ${item.completed ? 'text-slate-400 line-through' : 'text-slate-700'} ${!item.seen ? 'font-semibold' : ''}`}>
               {item.text}
-              {!item.seen && role === Role.STUDENT && (
+              {!item.seen && (
                 <span className="ml-2 inline-block w-2 h-2 bg-blue-500 rounded-full align-middle" title="Nuevo"></span>
               )}
             </span>

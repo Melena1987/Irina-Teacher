@@ -22,7 +22,7 @@ interface SidebarProps {
   currentStudentId: string | null;
   currentStudentName: string;
   onStudentChange: (id: string) => void;
-  onAddStudent?: (name: string) => void;
+  onAddStudentClick?: () => void;
   onLogout: () => void;
   onNavigate: (sectionId?: string) => void;
   notificationCount?: number;
@@ -34,9 +34,7 @@ const MiniCalendar = () => {
   const year = date.getFullYear();
   const daysInMonth = new Date(year, date.getMonth() + 1, 0).getDate();
   const firstDay = new Date(year, date.getMonth(), 1).getDay();
-  // Adjust for Monday start (0=Sunday in JS, but we want 0=Monday for UI usually in ES)
-  // JS: Sun=0, Mon=1... Sat=6. 
-  // Target: Mon=0, Tue=1... Sun=6.
+  // Adjust for Monday start
   const offset = firstDay === 0 ? 6 : firstDay - 1;
 
   return (
@@ -85,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentStudentId,
   currentStudentName,
   onStudentChange,
-  onAddStudent,
+  onAddStudentClick,
   onLogout,
   onNavigate,
   notificationCount
@@ -98,23 +96,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { icon: <BookOpen size={20} />, label: 'Recursos', id: 'resources-section' },
   ];
 
-  const handleAddClick = () => {
-    if (onAddStudent) {
-      const name = prompt("Nombre del nuevo estudiante:");
-      if (name && name.trim()) {
-        onAddStudent(name.trim());
-      }
-    }
-  };
-
   return (
     <aside 
       className={`
         fixed top-0 left-0 bottom-0 z-50 w-64 bg-slate-900 text-slate-100 flex flex-col shadow-xl flex-shrink-0
         transform transition-transform duration-300 ease-in-out md:translate-x-0
-        h-[100dvh] overflow-y-auto
+        overflow-y-auto
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}
+      style={{ height: '100%' }} /* Fallback for some browsers */
     >
       <div className="p-6 border-b border-slate-800 flex justify-between items-start flex-shrink-0">
         <div>
@@ -149,7 +139,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex justify-between items-center mb-2">
             <label className="text-xs font-semibold text-slate-500 block uppercase">Seleccionar Alumno</label>
             <button 
-              onClick={handleAddClick}
+              onClick={onAddStudentClick}
               className="text-xs flex items-center gap-1 text-emerald-400 hover:text-emerald-300 transition-colors"
               title="Añadir nuevo alumno"
             >

@@ -8,6 +8,7 @@ import { Sidebar } from './components/Sidebar';
 import { StudentHeader } from './components/StudentHeader';
 import { CalendarSection } from './components/CalendarSection';
 import { ResourcesSection } from './components/ResourcesSection';
+import { AddStudentModal } from './components/AddStudentModal';
 
 export default function App() {
   const [state, setState] = useState<AppState>(() => {
@@ -23,6 +24,7 @@ export default function App() {
   });
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('irinaTeacherAppState', JSON.stringify(state));
@@ -48,13 +50,13 @@ export default function App() {
     }));
   };
 
-  const handleAddStudent = (name: string) => {
+  const handleAddStudent = (data: { name: string; language: string; level: string; classType: 'Individual' | 'Grupo' }) => {
     const newStudent: StudentProfile = {
       id: Date.now().toString(),
-      name: name,
-      classType: 'Individual',
-      level: 'A1',
-      language: 'Inglés',
+      name: data.name,
+      classType: data.classType,
+      level: data.level,
+      language: data.language,
       objectives: [],
       notes: [],
       resources: []
@@ -65,6 +67,7 @@ export default function App() {
       students: [...prev.students, newStudent],
       currentStudentId: newStudent.id
     }));
+    setIsAddStudentModalOpen(false);
   };
 
   const handleNavigate = (sectionId?: string) => {
@@ -104,11 +107,11 @@ export default function App() {
   }
 
   // Calculate notifications logic:
-  // For Students: Count items they haven't "seen" yet. (!seen covers false or undefined)
-  // For Teachers: Keep counting "uncompleted" items to track student progress.
+  // For Students: Count items they haven't "seen" yet.
+  // For Teachers: Count items (Notes) they haven't "seen" yet.
   const notificationCount = state.currentUserRole === Role.STUDENT
     ? (currentStudent.notes.filter(n => !n.seen).length + currentStudent.objectives.filter(o => !o.seen).length)
-    : (currentStudent.notes.filter(n => !n.completed).length);
+    : (currentStudent.notes.filter(n => !n.seen).length);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
@@ -123,6 +126,14 @@ export default function App() {
         />
       )}
 
+      {/* MODAL FOR ADDING STUDENT */}
+      {isAddStudentModalOpen && (
+        <AddStudentModal 
+          onClose={() => setIsAddStudentModalOpen(false)}
+          onSave={handleAddStudent}
+        />
+      )}
+
       <Sidebar 
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
@@ -131,7 +142,7 @@ export default function App() {
         currentStudentId={state.currentStudentId}
         currentStudentName={currentStudent.name}
         onStudentChange={(id) => setState(prev => ({ ...prev, currentStudentId: id }))}
-        onAddStudent={handleAddStudent}
+        onAddStudentClick={() => setIsAddStudentModalOpen(true)}
         onLogout={handleLogout}
         onNavigate={handleNavigate}
         notificationCount={notificationCount}

@@ -49,11 +49,11 @@ export const CalendarSection: React.FC<CalendarSectionProps> = ({ calendarUrl, r
       
       {/* 
         Updated Container for Layout:
-        - Height is calculated to fit viewport minus header/margins approximately (calc(100vh - 80px)).
-        - This fits well because the calendar now starts at the top of the main content area.
+        - Mobile: Fixed shorter height (h-[400px]) or min height.
+        - Desktop (md): Calculated full height (calc(100vh - 80px)).
       */}
       <div className="w-full flex-1">
-        <div className="h-[calc(100vh-80px)] min-h-[500px] w-full bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative">
+        <div className="h-[400px] md:h-[calc(100vh-80px)] min-h-[300px] md:min-h-[500px] w-full bg-slate-50 rounded-lg border border-slate-200 overflow-hidden relative">
           {finalUrl ? (
             <iframe 
               src={finalUrl} 
