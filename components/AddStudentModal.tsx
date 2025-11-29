@@ -10,7 +10,7 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({ onClose, onSav
   const [formData, setFormData] = useState({
     name: '',
     language: 'Inglés',
-    level: 'A1',
+    level: '',
     classType: 'Individual' as 'Individual' | 'Grupo'
   });
 
@@ -70,18 +70,14 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({ onClose, onSav
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Nivel Inicial</label>
-              <select
-                className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              <input
+                type="text"
+                required
+                className="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                placeholder="Ej. B1.2, Avanzado..."
                 value={formData.level}
                 onChange={e => setFormData({ ...formData, level: e.target.value })}
-              >
-                <option value="A1">A1 - Acceso</option>
-                <option value="A2">A2 - Plataforma</option>
-                <option value="B1">B1 - Umbral</option>
-                <option value="B2">B2 - Avanzado</option>
-                <option value="C1">C1 - Dominio</option>
-                <option value="C2">C2 - Maestría</option>
-              </select>
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Tipo de Clase</label>
@@ -106,7 +102,7 @@ export const AddStudentModal: React.FC<AddStudentModalProps> = ({ onClose, onSav
             </button>
             <button
               type="submit"
-              disabled={!formData.name.trim()}
+              disabled={!formData.name.trim() || !formData.level.trim()}
               className="flex-1 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Check size={18} /> Guardar
